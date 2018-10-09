@@ -1,0 +1,53 @@
+# export ACCOUNTID=91234EXAMPLE
+# export REGION=us-east-1
+# export DEVICE=GGCore
+# export DEVICE_ARN=“arn:aws:iot:$REGION:$ACCOUNTID:thing/$DEVICE”
+
+# export ENDPOINT=$(aws iot describe-endpoint --endpoint-type iot:Data-ATS \
+| jq -r '.["endpointAddress"]’)
+
+# export BUCKET=my-s3-bucket-example
+# export STACK=greengrass-provisioning
+
+# export CERT_ARN=$(aws iot list-thing-principals --thing-name $DEVICE \
+| jq -r '.["principals"] | .[0]’)
+
+# aws greengrass create-core-definition –-name $DEVICE --initial-version \
+“Cores=[{CertificateArn=$CERT_ARN,Id=$DEVICE,SyncShadow=true,ThingArn=$DEVICE_ARN}]”
+
+# aws greengrass create-logger-definition -–name debug \
+–-initial-version file://logger.json
+
+# aws greengrass create-group-definition -–name GG --initial-version group.json
+
+# aws greengrass associate-role-to-group --group-id $(GROUP_ID) \
+--role-arn $(GROUP_ROLE_ARN) 
+
+# aws lambda create-function --region $(REGION) --function-name hello --handler hello \
+--role arn:aws:iam::$(ACCOUNTID):role/GGRole --zip-file fileb://hello.zip \
+--runtime arn:aws:greengrass:::runtime/function/executable 
+
+
+# aws greengrass create-function-definition --name hello \
+--initial-version file://function.json
+
+# aws greengrass create-subscription-definition --name hello \
+–-initial-version file://subscription.json
+
+# aws greengrass create-resource-definition –-name hello \
+--initial-version file://resource.json
+
+# aws greengrass create-device-definition –-name hello \
+--initial-version file://device.json
+
+# aws greengrass create-group-version --group-id $(GROUP_ID) \
+--core-definition-version-arn $(CORE_VERSION_ARN) \
+--function-definition-version-arn $(FUNCTION_VERSION_ARN) \
+--logger-definition-version-arn $(LOG_VERSION_ARN) \
+--subscription-definition-version-arn $(SUBSCRIPTION_VERSION_ARN) 
+
+# aws greengrass create-deployment \ 
+--group-id $(GROUP_ID) \
+--group-version-id $(GROUP_VERSION_ID) \
+--deployment-type NewDeployment 
+
